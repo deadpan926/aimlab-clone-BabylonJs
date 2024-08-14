@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <div class="targetSize">
         <label for="targetSize">目标大小：</label>
         <input
           type="range"
           id="targetSize"
           v-model="targetStore.targetSize"
-          min="0.1"
+          min="0.5"
           max="2"
           step="0.1"
           @input="onTargetSizeChange"
@@ -18,7 +18,9 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { createScene, updateTargetSize } from '../scenes/AimlabScene';
+// import { createScene } from '../scenes/AimlabScene';
+import { createScene } from '../scenes/AimlabTraceTaskSceen';
+
 import { useTargetStore } from '../stores/targetStore';
 import Crosshair from './Crosshair.vue';
 
@@ -40,6 +42,10 @@ canvas {
 width: 100%;
 height: 100%;
 touch-action: none;
+}
+
+.targetSize {
+    position: absolute;
 }
 
 </style>

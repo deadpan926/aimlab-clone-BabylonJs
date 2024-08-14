@@ -4,6 +4,7 @@ export const useTargetStore = defineStore('target', {
   state: () => ({
     targets: [],
     targetSize: 1,
+    targetsNumber : 10
   }),
   actions: {
     setTargetSize(size) {
