@@ -1,36 +1,45 @@
 <template>
+    <div>
+        <label for="targetSize">目标大小：</label>
+        <input
+          type="range"
+          id="targetSize"
+          v-model="targetStore.targetSize"
+          min="0.1"
+          max="2"
+          step="0.1"
+          @input="onTargetSizeChange"
+        >
+        <span>{{ targetStore.targetSize }}</span>
+      </div>
     <canvas ref="babylonCanvas"></canvas>
-    <div class="crosshair"></div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import { createScene } from '../scenes/AimlabScene'
-  const babylonCanvas = ref();
-  
-  
-  onMounted(() => {
-    createScene(babylonCanvas.value);
-  });
-  </script>
-  
-  <style scoped>
-  canvas {
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-  }
+    <Crosshair />
+</template>
 
-  .crosshair {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 6px;  /* 减小尺寸 */
-    height: 6px; /* 减小尺寸 */
-    background-color: #00FF00;  /* 使用绿色 */
-    border-radius: 50%;  /* 保持圆形 */
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    box-shadow: 0 0 4px #00FF00;  /* 添加发光效果 */
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import { createScene, updateTargetSize } from '../scenes/AimlabScene';
+import { useTargetStore } from '../stores/targetStore';
+import Crosshair from './Crosshair.vue';
+
+const babylonCanvas = ref();
+const targetSize = ref(1);
+const targetStore = useTargetStore();
+
+onMounted(() => {
+  createScene(babylonCanvas.value, targetStore);
+});
+
+function onTargetSizeChange() {
+  targetStore.updateTargetSizes();
 }
-  </style>
+</script>
+
+<style scoped>
+canvas {
+width: 100%;
+height: 100%;
+touch-action: none;
+}
+
+</style>
