@@ -19,13 +19,12 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 // import { createScene } from '../scenes/AimlabScene';
-import { createScene } from '../scenes/AimlabTraceTaskSceen';
+import { createScene } from '../views/trace-task/scenes/AimlabTraceTaskSceen';
 
 import { useTargetStore } from '../stores/targetStore';
 import Crosshair from './Crosshair.vue';
 
 const babylonCanvas = ref();
-const targetSize = ref(1);
 const targetStore = useTargetStore();
 
 onMounted(() => {

@@ -1,9 +1,15 @@
 import { Engine, Scene, Vector3, HemisphericLight, Texture, MeshBuilder, Matrix, StandardMaterial, Color3, FreeCamera, Animation } from '@babylonjs/core';
+// import { AdvancedDynamicTexture, TextBlock } from '@babylonjs/gui';
 import grassTexture from '@/assets/material/black.jpg';
 
-let scene, target, isTracking = false;
 
-const createScene = (canvas, targetStore) => {
+let scene, target, isTracking = false;
+let trainingStartTime
+
+
+const TRAINING_DURATION = 5000;
+
+const createScene = (canvas, trainingTimer) => {
     const engine = new Engine(canvas);
     scene = new Scene(engine);
 
@@ -42,6 +48,7 @@ const createScene = (canvas, targetStore) => {
     yellowMaterial.diffuseColor = new Color3(1, 1, 0);
     yellowMaterial.specularColor = new Color3(0, 0, 0);
 
+
     // 创建目标红点
     const createTarget = () => {
         target = MeshBuilder.CreateSphere('target', { diameter: 0.5 }, scene);
@@ -52,10 +59,43 @@ const createScene = (canvas, targetStore) => {
 
     target = createTarget();
 
+
     const startTracking = () => {
         isTracking = true;
+        trainingStartTime = Date.now();
+        trainingTimer.startTraining();
         animateTarget();
+        setTimeout(endTracking, TRAINING_DURATION)
     };
+
+    const updateTraining = (timestamp) => {
+        if (!isTracking) return;
+
+        const elapsedTime = timestamp - trainingStartTime;
+        const remainingTime = Math.max(0, TRAINING_DURATION - elapsedTime);
+
+        countdownTimer.text = (remainingTime / 1000).toFixed(2);
+
+        if (elapsedTime >= TRAINING_DURATION) {
+            endTracking();
+        } else {
+            checkHit(elapsedTime);
+            requestAnimationFrame(updateTraining);
+        }
+    };
+
+    const endTracking = () => {
+        isTracking = false;
+        stopAnimateTarget();
+        const resultText = `Training ended.\nHit time: ${trainingTimer.hitTime}ms\nMiss time: ${trainingTimer.missTime}ms\nTotal time: ${trainingTimer.totalTime}ms`;
+        console.log(resultText);
+    }
+
+    const stopAnimateTarget = () => {
+        scene.stopAnimation(target)
+    }
+
+    const targetSpeed = 2
 
     const animateTarget = () => {
         const frameRate = 10;
@@ -71,8 +111,8 @@ const createScene = (canvas, targetStore) => {
         keyFrames.y.push({ frame: 0, value: target.position.y });
 
         for (let i = 1; i <= 100; i++) {
-            keyFrames.x.push({ frame: i * frameRate, value: Math.random() * 18 - 9 });
-            keyFrames.y.push({ frame: i * frameRate, value: Math.random() * 8 + 1 });
+            keyFrames.x.push({ frame: i * frameRate * targetSpeed, value: Math.random() * 18 - 9 });
+            keyFrames.y.push({ frame: i * frameRate * targetSpeed, value: Math.random() * 8 + 1 });
         }
 
         xSlide.setKeys(keyFrames.x);
@@ -81,37 +121,44 @@ const createScene = (canvas, targetStore) => {
         target.animations.push(xSlide);
         target.animations.push(ySlide);
 
-        scene.beginAnimation(target, 0, 100 * frameRate, true);
+        scene.beginAnimation(target, 0, 100 * frameRate * targetSpeed, true);
     };
 
-    const shoot = () => {
-        if (!isTracking) {
-            startTracking();
-            return;
-        }
-
+    const checkHit = () => {
         const pointerX = engine.getRenderWidth() / 2;
         const pointerY = engine.getRenderHeight() / 2;
+
         const ray = scene.createPickingRay(pointerX, pointerY, Matrix.Identity(), camera);
 
         const hit = scene.pickWithRay(ray);
         if (hit.pickedMesh && hit.pickedMesh.name === 'target') {
             target.material = yellowMaterial;
-            setTimeout(() => {
-                target.material = redMaterial;
-            }, 100);
+            trainingTimer.addHitTime(16.667)
+        } else {
+            target.material = redMaterial;
+            trainingTimer.addMissTime(16.667)
         }
     };
+
 
     // 点击事件处理
     scene.onPointerDown = (evt) => {
         if (evt.button === 0) {
             engine.enterPointerlock();
-            shoot();
+            if (!isTracking) {
+                startTracking();
+            }
+        }
+        if (evt.button === 2) {
+            engine.exitPointerlock();
+            endTracking();
         }
     };
 
     engine.runRenderLoop(() => {
+        if (isTracking){
+            checkHit();
+        }
         scene.render();
     });
 
