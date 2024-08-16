@@ -11,9 +11,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@babylonjs/core": "^7.20.1",
+    "@babylonjs/core": "^7.21.1",
     "@babylonjs/gui": "^7.20.1",
-    "@babylonjs/loaders": "^7.20.1",
+    "@babylonjs/loaders": "^7.21.1",
     "element-plus": "^2.8.0",
     "pinia": "^2.1.7",
     "vue": "^3.4.29",

@@ -5,6 +5,7 @@ export const useTargetStore = defineStore('target', () => {
   const targets = ref([])
   const targetSize = ref(1)
   const targetsNumber = ref(10)
+  const targetHitCount = ref(0)
 
   function setTargetSize(size) {
     targetSize.value = size
@@ -24,13 +25,19 @@ export const useTargetStore = defineStore('target', () => {
     })
   }
 
+  function addtargetHitCount() {
+    targetHitCount.value += 1
+  }
+
   return {
     targets,
     targetSize,
     targetsNumber,
+    targetHitCount,
     setTargetSize,
     addTarget,
     removeTarget,
-    updateTargetSizes
+    updateTargetSizes,
+    addtargetHitCount,
   }
 })

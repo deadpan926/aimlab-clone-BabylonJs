@@ -1,7 +1,7 @@
 import { Engine, Scene, Vector3, HemisphericLight, Texture, MeshBuilder, Matrix, StandardMaterial, Color3, FreeCamera, Animation } from '@babylonjs/core';
 // import { AdvancedDynamicTexture, TextBlock } from '@babylonjs/gui';
 import grassTexture from '@/assets/material/black.jpg';
-
+import { loadGLTFModel } from '../../../scenes/gunLoader'
 
 let scene, target, isTracking = false;
 let trainingStartTime
@@ -23,6 +23,9 @@ const createScene = (canvas, trainingTimer) => {
     // 关闭相机的惯性
     camera.inertia = 0;
     const light = new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
+
+    // // 枪模型加载
+    loadGLTFModel(scene, camera)
 
     // 创建墙
     const wall = MeshBuilder.CreatePlane('wall', { width: 20, height: 10 }, scene);
@@ -72,9 +75,7 @@ const createScene = (canvas, trainingTimer) => {
         if (!isTracking) return;
 
         const elapsedTime = timestamp - trainingStartTime;
-        const remainingTime = Math.max(0, TRAINING_DURATION - elapsedTime);
 
-        countdownTimer.text = (remainingTime / 1000).toFixed(2);
 
         if (elapsedTime >= TRAINING_DURATION) {
             endTracking();
@@ -89,6 +90,7 @@ const createScene = (canvas, trainingTimer) => {
         stopAnimateTarget();
         const resultText = `Training ended.\nHit time: ${trainingTimer.hitTime}ms\nMiss time: ${trainingTimer.missTime}ms\nTotal time: ${trainingTimer.totalTime}ms`;
         console.log(resultText);
+        engine.exitPointerlock();
     }
 
     const stopAnimateTarget = () => {

@@ -1,5 +1,10 @@
 import { Engine, Scene, Vector3, HemisphericLight, Texture, MeshBuilder, Matrix ,StandardMaterial,Color3, FreeCamera } from '@babylonjs/core';
+// import "@babylonjs/core/Loading/sceneLoader";
+import "@babylonjs/loaders/OBJ/objFileLoader";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import grassTexture from '@/assets/material/black.jpg';
+import { loadGLTFModel } from '../../../scenes/gunLoader'
+
 let scene
 
 const createScene = ( canvas, targetStore ) => {
@@ -18,7 +23,10 @@ const createScene = ( canvas, targetStore ) => {
     camera.inertia = 0
     const light = new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
 
-    // new PointLight("Omni", new Vector3(0, 100, 100), scene);
+    // // 枪模型加载
+    loadGLTFModel(scene, camera)
+
+
     // 创建墙
     const wall = MeshBuilder.CreatePlane('wall', { width: 20, height: 10 }, scene);
     wall.position = new Vector3(0, 5, 10);
@@ -53,7 +61,6 @@ const createScene = ( canvas, targetStore ) => {
     // 创建多个目标
     const targets = Array(10).fill().map(() => createTarget(targetStore.targetSize));
 
-    console.log("targets", targetStore.targets)
     
     const shoot = () => {
         const pointerX = engine.getRenderWidth() / 2;
@@ -76,6 +83,9 @@ const createScene = ( canvas, targetStore ) => {
                 // 创建新目标
                 const newTarget = createTarget(targetStore.targetSize);
                 targets.push(newTarget)
+
+                // 设置counter
+                targetStore.addtargetHitCount()
             }
         }
     };
@@ -126,7 +136,6 @@ const createScene = ( canvas, targetStore ) => {
       engine.resize();
     });
   };
-
 
 
   export { createScene }
