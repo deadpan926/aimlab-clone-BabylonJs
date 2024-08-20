@@ -2,7 +2,7 @@ import { SceneLoader, Vector3, StandardMaterial, TransformNode, Color3} from '@b
 import "@babylonjs/loaders/glTF";
 
 
-async function loadGLTFModel(scene, camera) {
+async function loadGLTFModel(scene, camera, right_hand_mode = true) {
     const modelPath = '/src/assets/gun_model/sci_fi_gun/';
     const fileName = 'Sci-fi-Gun.glb';
 
@@ -20,6 +20,7 @@ async function loadGLTFModel(scene, camera) {
             // 如果需要,调整枪支的旋转
             m.rotation = new Vector3(degToRad(0), degToRad(-70), degToRad(15));
         });
+        return result
     } catch (error) {
         console.error("Error loading the gun model:", error);
     }

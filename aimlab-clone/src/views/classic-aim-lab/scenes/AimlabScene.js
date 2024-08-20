@@ -1,11 +1,11 @@
-import { Engine, Scene, Vector3, HemisphericLight, Texture, MeshBuilder, Matrix ,StandardMaterial,Color3, FreeCamera } from '@babylonjs/core';
+import { Engine, Scene, Vector3, HemisphericLight, Texture, MeshBuilder, Matrix ,StandardMaterial,Color3, FreeCamera, Animation } from '@babylonjs/core';
 // import "@babylonjs/core/Loading/sceneLoader";
 import "@babylonjs/loaders/OBJ/objFileLoader";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import grassTexture from '@/assets/material/black.jpg';
 import { loadGLTFModel } from '../../../scenes/gunLoader'
 
-let scene
+let gunModel
 
 const createScene = ( canvas, targetStore ) => {
 
@@ -24,7 +24,10 @@ const createScene = ( canvas, targetStore ) => {
     const light = new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
 
     // // 枪模型加载
-    loadGLTFModel(scene, camera)
+    loadGLTFModel(scene, camera).then(model => {
+        gunModel = model;
+        console.log("引用枪模型", gunModel)
+    })
 
 
     // 创建墙
@@ -88,7 +91,12 @@ const createScene = ( canvas, targetStore ) => {
                 targetStore.addtargetHitCount()
             }
         }
+        if (gunModel) {
+            console.log("shooooooooot!")
+            shootAnimation(gunModel)
+        }
     };
+
 
     // 射击功能
     // const shoot = () => {
@@ -126,6 +134,37 @@ const createScene = ( canvas, targetStore ) => {
             engine.enterPointerlock()
             shoot()
         }
+    };
+
+    const shootAnimation = (gunMeshes) => {
+        const frameRate = 60;
+        const recoilDistance = 0.35; // 减小后坐力距离，因为我们要移动多个 mesh
+        const recoilDuration = 6; // 动画持续帧数
+    
+        console.log("gunMeshes object", gunMeshes)
+        // 为每个 mesh 创建和应用动画
+        gunMeshes.meshes.forEach((mesh, index) => {
+            if (mesh && mesh.position) {
+                const recoilAnimation = new Animation(
+                    `recoilAnimation_${index}`,
+                    "position.z",
+                    frameRate,
+                    Animation.ANIMATIONTYPE_FLOAT,
+                    Animation.ANIMATIONLOOPMODE_CYCLE
+                );
+    
+                const keyFrames = [
+                    { frame: 0, value: mesh.position.z },
+                    { frame: recoilDuration / 2, value: mesh.position.z + recoilDistance },
+                    { frame: recoilDuration, value: mesh.position.z }
+                ];
+    
+                recoilAnimation.setKeys(keyFrames);
+    
+                mesh.animations = [recoilAnimation];
+                scene.beginAnimation(mesh, 0, recoilDuration, false);
+            }
+        });
     };
 
     engine.runRenderLoop(() => {

@@ -36,8 +36,11 @@
       </span>
   </template>
 </el-dialog>
-    </div>
 
+<!-- <el-dialog v-model="showInputbox">
+  <ElInput>点击小球</ElInput>
+</el-dialog> -->
+    </div>
   </div>
     
 </template>
@@ -51,10 +54,12 @@ import Crosshair from '../../components/Crosshair.vue';
 
 import { HomeFilled } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { ElInput } from 'element-plus';
 
 const babylonCanvas = ref();
 const targetStore = useTargetStore();
 const showResult = ref(false);
+const showInputbox = ref(true);
 const router = useRouter()
 
 onMounted(() => {

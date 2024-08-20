@@ -105,7 +105,7 @@ const createScene = (canvas, trainingTimer) => {
         const ySlide = new Animation("ySlide", "position.y", frameRate, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
         const keyFrames = {
-            x: [],
+            x: [], 
             y: []
         };
 
